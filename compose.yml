@@ -1,0 +1,26 @@
+name: currency
+
+
+services:
+
+  backend:
+    build: ./build/package/Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+  db:
+    image: mysql:9.0
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_USER: strcarne
+      MYSQL_PASSWORD: ilovegolang
+      MYSQL_DATABASE: currency
+    volumes:
+      - db-data:/var/lib/mysql
+
+
+volumes:
+  db-data:
