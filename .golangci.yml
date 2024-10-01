@@ -1,0 +1,16 @@
+linters:
+  enable-all: true
+  disable:
+    - execinquery
+    - exportloopref
+    - gomnd
+
+linters-settings:
+  depguard:
+    rules:
+      # Name of a rule.
+      main:
+        list-mode: lax
+        allow:
+          - $gostd
+          - github.com/labstack/echo/v4
