@@ -14,4 +14,3 @@ type Rate struct {
 	Name         string  `gorm:"varchar(64);not null"                                   json:"Cur_Name"`
 	OfficialRate float64 `gorm:"not null"                                               json:"Cur_OfficialRate"`
 }
-
