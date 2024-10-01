@@ -3,7 +3,7 @@ package nbrb
 import (
 	"context"
 
-	"github.com/strCarne/currency/internal/models/schema"
+	"github.com/strCarne/currency/internal/schema"
 	"github.com/strCarne/currency/pkg/models"
 )
 

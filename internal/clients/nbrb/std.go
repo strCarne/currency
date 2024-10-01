@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/strCarne/currency/internal/models/schema"
+	"github.com/strCarne/currency/internal/schema"
 	"github.com/strCarne/currency/pkg/models"
 	"github.com/strCarne/currency/pkg/wrapper"
 )
@@ -37,7 +37,12 @@ func (n ClientStd) GetRates(
 	queryParams := evaluateQueryParams(onDate, &periodicity, paramMode)
 	endpoint.RawQuery = queryParams.Encode()
 
-	resp, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
+	if err != nil {
+		return nil, wrapper.Wrap("clients.nbrb.GetRates", "couldn't create http-request for getting NBRB rates", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, wrapper.Wrap("clients.nbrb.GetRates", "couldn't get NBRB rates", err)
 	}
