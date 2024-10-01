@@ -14,7 +14,7 @@ import (
 //nolint:gochecknoglobals
 var connection *gorm.DB
 
-func InitializeGORM() {
+func initGORM() {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		panic("DATABASE_URL is not set")
@@ -31,7 +31,7 @@ func InitializeGORM() {
 
 func Connection() *gorm.DB {
 	if connection == nil {
-		panic("connection is not initialized (use InitializeGORM in main func)")
+		initGORM()
 	}
 
 	return connection
