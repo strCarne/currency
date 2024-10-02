@@ -11,6 +11,7 @@ type DBClientSelect interface {
 	SelectRates(ctx context.Context) ([]schema.Rate, error)
 	SelectRateByID(ctx context.Context, id int) (*schema.Rate, error)
 	SelectRatesByCurID(ctx context.Context, curID int) ([]schema.Rate, error)
+	SelectRateByDate(ctx context.Context, onDate models.Date) ([]schema.Rate, error)
 	SelectRatesByCurIDAndDate(ctx context.Context, curID int, onDate models.Date) ([]schema.Rate, error)
 }
 

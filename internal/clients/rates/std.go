@@ -51,6 +51,17 @@ func (d DBClientStd) SelectRatesByCurID(ctx context.Context, curID int) ([]schem
 	return rates, nil
 }
 
+func (d DBClientStd) SelectRateByDate(ctx context.Context, onDate models.Date) ([]schema.Rate, error) {
+	var rates []schema.Rate
+	result := d.connPool.WithContext(ctx).Where("on_date = ?", onDate).Find(&rates)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return rates, nil
+}
+
 func (d DBClientStd) SelectRatesByCurIDAndDate(
 	ctx context.Context,
 	curID int,
