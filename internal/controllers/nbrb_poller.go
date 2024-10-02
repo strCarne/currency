@@ -119,6 +119,7 @@ func (n NBRBPoller) Poll(date *models.Date) ([]schema.Rate, error) {
 }
 
 func (n NBRBPoller) InstantPoll(date *models.Date) ([]schema.Rate, error) {
+	//nolint:mnd
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
@@ -137,13 +138,15 @@ func (n NBRBPoller) Request(date models.Date) <-chan []schema.Rate {
 
 	go func() {
 		rates, err := n.InstantPoll(&date)
-		if err != nil {
+
+		switch {
+		case err != nil:
 			n.logger.Error("failed to poll", slog.String("cause", err.Error()))
 			ratesTx <- nil
-		} else if len(rates) == 0 {
+		case len(rates) == 0:
 			n.logger.Warn("no rates found")
 			ratesTx <- nil
-		} else {
+		default:
 			ratesTx <- rates
 			n.enricherRx <- rates
 		}

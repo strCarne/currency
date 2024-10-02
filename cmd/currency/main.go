@@ -1,9 +1,16 @@
+//nolint:godot
 package main
 
 import (
 	"github.com/strCarne/currency/internal/setup"
 )
 
+// @title Currency
+// @version 1.0.0
+// @description Service collects all conversion rates relative to BYN from NBRB's API once a day.
+// @host 0.0.0.0:8000
+// @Schemes http
+// @BasePath /
 func main() {
 	// Setting environment variables
 	setup.MustEnv()
@@ -26,6 +33,6 @@ func main() {
 	go poller.Start()
 
 	// Setting up echo server
-	echoServer := setup.Echo(logger, connPool, poller)
-	echoServer.Logger.Fatal(echoServer.Start(":8000"))
+	e := setup.Echo(logger, connPool, poller)
+	e.Logger.Fatal(e.Start("0.0.0.0:8000"))
 }

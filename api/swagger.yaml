@@ -1,0 +1,129 @@
+basePath: /
+definitions:
+  github_com_strCarne_currency_internal_schema.Rate:
+    properties:
+      Cur_Abbreviation:
+        type: string
+      Cur_ID:
+        type: integer
+      Cur_Name:
+        type: string
+      Cur_OfficialRate:
+        type: number
+      Cur_Scale:
+        type: integer
+      Date:
+        type: string
+    type: object
+  github_com_strCarne_currency_pkg_models.ProjectInfo:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      version:
+        $ref: '#/definitions/github_com_strCarne_currency_pkg_models.Version'
+    type: object
+  github_com_strCarne_currency_pkg_models.Version:
+    properties:
+      major:
+        type: integer
+      minor:
+        type: integer
+      patch:
+        type: integer
+    type: object
+  github_com_strCarne_currency_pkg_shared.Response-array_github_com_strCarne_currency_internal_schema_Rate:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/github_com_strCarne_currency_internal_schema.Rate'
+        type: array
+      message:
+        type: string
+    type: object
+  github_com_strCarne_currency_pkg_shared.Response-error:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+  github_com_strCarne_currency_pkg_shared.Response-github_com_strCarne_currency_pkg_models_ProjectInfo:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/github_com_strCarne_currency_pkg_models.ProjectInfo'
+      message:
+        type: string
+    type: object
+host: 0.0.0.0:8000
+info:
+  contact: {}
+  description: Service collects all conversion rates relative to BYN from NBRB's API
+    once a day.
+  title: Currency
+  version: 1.0.0
+paths:
+  /:
+    get:
+      description: Get general service info and check if service is up and running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_strCarne_currency_pkg_shared.Response-github_com_strCarne_currency_pkg_models_ProjectInfo'
+      summary: Returns general service info
+      tags:
+      - General
+  /rates/all-collected:
+    get:
+      description: |-
+        Get all rates, that have been ever polled from NBRB's API and stored into the database. Can return 500 in
+        case if DB is not reachable.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_strCarne_currency_pkg_shared.Response-array_github_com_strCarne_currency_internal_schema_Rate'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_strCarne_currency_pkg_shared.Response-error'
+      summary: Returns all collected rates
+      tags:
+      - Rates
+  /rates/by-date/{date}:
+    get:
+      description: Get all rates on specified date and store them into the database.
+      parameters:
+      - description: date in format yyyy-mm-dd
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_strCarne_currency_pkg_shared.Response-array_github_com_strCarne_currency_internal_schema_Rate'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_strCarne_currency_pkg_shared.Response-error'
+      summary: Returns rates on specified date
+      tags:
+      - Rates
+schemes:
+- http
+swagger: "2.0"
