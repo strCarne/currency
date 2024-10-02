@@ -119,7 +119,10 @@ func (n NBRBPoller) Poll(date *models.Date) ([]schema.Rate, error) {
 }
 
 func (n NBRBPoller) InstantPoll(date *models.Date) ([]schema.Rate, error) {
-	rates, err := n.client.GetRates(context.Background(), date, nbrb.Dayly, nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	rates, err := n.client.GetRates(ctx, date, nbrb.Dayly, nil)
 	if err != nil {
 		return nil, ErrPoll
 	}
