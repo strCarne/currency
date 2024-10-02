@@ -9,10 +9,10 @@ import (
 
 	"github.com/strCarne/currency/internal/clients/rates"
 	"github.com/strCarne/currency/internal/controllers"
-	"github.com/strCarne/currency/pkg/db"
+	"gorm.io/gorm"
 )
 
-func MustEnricher(logger *slog.Logger) *controllers.Enricher {
+func MustEnricher(logger *slog.Logger, connPool *gorm.DB) *controllers.Enricher {
 	attemptsNumStr := os.Getenv("ENRICH_ATTEMPTS_NUM")
 	if attemptsNumStr == "" {
 		panic("ENRICH_ATTEMPTS_NUM must be set")
@@ -33,7 +33,7 @@ func MustEnricher(logger *slog.Logger) *controllers.Enricher {
 		panic("ENRICH_RETRY_DELAY must be duration")
 	}
 
-	enricher, err := controllers.NewEnricher(rates.NewStd(db.Connection()), logger, attemptsNum, retryDelay)
+	enricher, err := controllers.NewEnricher(rates.NewStd(connPool), logger, attemptsNum, retryDelay)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create new NBRB poller: %v", err))
 	}

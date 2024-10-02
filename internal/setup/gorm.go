@@ -13,7 +13,7 @@ const (
 	MaxOpenConns = 100
 )
 
-func MustGORM() {
+func MustGORM() *gorm.DB {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		panic("DATABASE_URL must be set")
@@ -24,16 +24,19 @@ func MustGORM() {
 		SkipDefaultTransaction: true,
 	}
 
-	if err := db.InitGORM(dsn, gormConfig); err != nil {
-		panic(err)
-	}
-
-	pool, err := db.Connection().DB()
+	connPool, err := db.InitGORM(dsn, gormConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	pool.SetMaxIdleConns(MaxIdleConns)
-	pool.SetMaxOpenConns(MaxOpenConns)
-	pool.SetConnMaxLifetime(time.Hour)
+	sqlDB, err := connPool.DB()
+	if err != nil {
+		panic(err)
+	}
+
+	sqlDB.SetMaxIdleConns(MaxIdleConns)
+	sqlDB.SetMaxOpenConns(MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	return connPool
 }
