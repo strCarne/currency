@@ -68,7 +68,7 @@ func (d DBClientStd) SelectRatesByCurIDAndDate(
 	onDate models.Date,
 ) ([]schema.Rate, error) {
 	var rates []schema.Rate
-	result := d.connPool.WithContext(ctx).Where("currency_id = ? AND on_date = ?", curID, onDate).Find(&rates)
+	result := d.connPool.WithContext(ctx).Where("currency_id = ? AND on_date = ?", curID, onDate.String()).Find(&rates)
 
 	if result.Error != nil {
 		return nil, result.Error
