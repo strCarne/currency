@@ -10,6 +10,9 @@ func main() {
 	// Setting environment variables
 	setup.MustEnv()
 
+	// Setting up GORM
+	setup.MustGORM()
+
 	// Migrations
 	setup.MustMigrate(db.Connection())
 
