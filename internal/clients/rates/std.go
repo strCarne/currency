@@ -20,7 +20,7 @@ func NewStd(connPool *gorm.DB) DBClientStd {
 
 func (d DBClientStd) SelectRates(ctx context.Context) ([]schema.Rate, error) {
 	var rates []schema.Rate
-	result := d.connPool.Find(&rates)
+	result := d.connPool.WithContext(ctx).Find(&rates)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -51,7 +51,11 @@ func (d DBClientStd) SelectRatesByCurID(ctx context.Context, curID int) ([]schem
 	return rates, nil
 }
 
-func (d DBClientStd) SelectRatesByCurIDAndDate(ctx context.Context, curID int, onDate models.Date) ([]schema.Rate, error) {
+func (d DBClientStd) SelectRatesByCurIDAndDate(
+	ctx context.Context,
+	curID int,
+	onDate models.Date,
+) ([]schema.Rate, error) {
 	var rates []schema.Rate
 	result := d.connPool.WithContext(ctx).Where("currency_id = ? AND on_date = ?", curID, onDate).Find(&rates)
 
