@@ -56,15 +56,10 @@ func NewEnricher(
 }
 
 func (e Enricher) Start() {
-	e.EnrichFromBackup()
-
 	for rates := range e.ratesFlow {
-		e.EnrichFromBackup()
-
 		err := e.Enrich(rates)
 		if err != nil {
 			e.logger.Error("enriching failed", slog.String("cause", err.Error()))
-			e.Backup(rates)
 		}
 	}
 }
@@ -97,13 +92,12 @@ func (e Enricher) Enrich(rates []schema.Rate) error {
 }
 
 func (e Enricher) InstantEnrich(rates []schema.Rate) error {
+	//nolint:mnd
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
 	//nolint:wrapcheck
-	return e.client.InsertRates(context.Background(), rates)
+	return e.client.InsertRates(ctx, rates)
 }
-
-func (e Enricher) Backup(_ []schema.Rate) {
-}
-
-func (e Enricher) EnrichFromBackup() {}
 
 func (e Enricher) RatesRx() chan<- []schema.Rate { return e.ratesFlow }
