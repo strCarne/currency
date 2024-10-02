@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/strCarne/currency/internal/clients/rates"
 	"github.com/strCarne/currency/internal/schema"
-	"github.com/strCarne/currency/pkg/wrapper"
 )
 
 var (
@@ -72,8 +72,16 @@ func (e Enricher) Enrich(rates []schema.Rate) error {
 		e.logger.Info("enrich attempt", slog.Int("number", attempt+1))
 
 		err := e.InstantEnrich(rates)
+
 		if err == nil {
 			e.logger.Info("enriching completed successfully", slog.Any("data", rates))
+
+			return nil
+		}
+
+		var mysqlError *mysql.MySQLError
+		if errors.As(err, &mysqlError) && mysqlError.Number == 1062 {
+			e.logger.Info("enriching completed successfully", slog.String("cause", "data already exists"))
 
 			return nil
 		}
@@ -87,11 +95,8 @@ func (e Enricher) Enrich(rates []schema.Rate) error {
 }
 
 func (e Enricher) InstantEnrich(rates []schema.Rate) error {
-	return wrapper.Wrap(
-		"controllers.enricher.InstantEnrich",
-		"enriching failed",
-		e.client.InsertRates(context.Background(), rates),
-	)
+	//nolint:wrapcheck
+	return e.client.InsertRates(context.Background(), rates)
 }
 
 func (e Enricher) Backup(_ []schema.Rate) {
