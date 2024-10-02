@@ -5,7 +5,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/strCarne/currency/pkg/models"
-	"github.com/strCarne/currency/pkg/shared"
 	"github.com/strCarne/currency/pkg/wrapper"
 )
 
@@ -22,17 +21,9 @@ func Index(ctx echo.Context) error {
 		},
 	}
 
-	code := http.StatusOK
-
-	response := shared.Response[models.ProjectInfo]{
-		Code:    code,
-		Message: "operation completed successfully",
-		Data:    info,
-	}
-
 	return wrapper.Wrap(
 		"internal.routes.general.Index",
-		"operation completed successfully",
-		ctx.JSON(code, &response),
+		"Index handler failed",
+		jsonResponse(ctx, http.StatusOK, "operation completed successfully", info),
 	)
 }
