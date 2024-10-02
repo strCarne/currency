@@ -1,11 +1,6 @@
 package main
 
 import (
-	"log"
-	"log/slog"
-	"os"
-
-	"github.com/joho/godotenv"
 	"github.com/strCarne/currency/internal/schema"
 	"github.com/strCarne/currency/internal/setup"
 	"github.com/strCarne/currency/pkg/db"
@@ -13,16 +8,13 @@ import (
 
 func main() {
 	// Setting environment variables
-	err := godotenv.Load()
-	if err != nil {
-		log.Panicf("failed to load .env file: %v", err)
-	}
+	setup.MustEnv()
 
 	// Migrations
 	setup.MustMigrate(db.Connection())
 
 	// Setting up logger
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := setup.MustLogger()
 
 	// Setting up channel between Poller and Enricher
 	ratesFlow := make(chan []schema.Rate)
@@ -31,6 +23,10 @@ func main() {
 	// Starting process of polling NBRB's API
 	poller := setup.MustPoller(logger)
 	go poller.Start(ratesFlow)
+
+	// Starting process of enriching rates table
+	enricher := setup.MustEnricher(logger)
+	go enricher.Start(ratesFlow)
 
 	// Setting up echo server
 	echoServer := setup.Echo(logger)
