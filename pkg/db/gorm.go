@@ -9,9 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	ErrInitGORM = errors.New("filed to initialize GORM")
-)
+var ErrInitGORM = errors.New("filed to initialize GORM")
 
 func InitDefaultGORM() (*gorm.DB, error) {
 	dsn := os.Getenv("DATABASE_URL")
@@ -34,6 +32,5 @@ func InitGORM(dsn string, config *gorm.Config) (*gorm.DB, error) {
 		return nil, wrapper.Wrap("db.gorm.InitDefaultGORM", "failed to open", err)
 	}
 
-	
 	return connPool, nil
 }

@@ -37,5 +37,5 @@ func DateParse(s string) (*Date, error) {
 }
 
 func (d Date) String() string {
-	return fmt.Sprintf("%04d-%02d-%02d", d.Year, d.Month, d.Day)
+	return fmt.Sprintf("%04d-%02d-%02dT00:00:00", d.Year, d.Month, d.Day)
 }
