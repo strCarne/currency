@@ -1,5 +1,6 @@
 package routes
 
+//nolint:gci
 import (
 	"context"
 	"net/http"
@@ -40,14 +41,15 @@ func RatesByDate(ctx Context) error {
 	fetchedFromRemote := false
 
 	rates, err := ratesClient.SelectRateByDate(context.Background(), *date)
-	if err != nil {
+	if err != nil || len(rates) == 0 {
 		rx := ctx.Poller.Request(*date)
-		rates = <-rx
-		fetchedFromRemote = true
-	}
 
-	if rates == nil {
-		return jsonResponse(ctx.EchoCtx, http.StatusNotFound, "couldn't find rates locally and remotely", err)
+		rates = <-rx
+		if rates == nil {
+			return jsonResponse[any](ctx.EchoCtx, http.StatusNotFound, "couldn't find rates locally and remotely", nil)
+		}
+
+		fetchedFromRemote = true
 	}
 
 	var message string
