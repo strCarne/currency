@@ -55,12 +55,20 @@ func NewNBRBPoller(
 }
 
 func (n NBRBPoller) Start(destination chan<- []schema.Rate) {
+	n.logger.Info("started polling at %v", slog.Time("timestamp", time.Now()))
 	n.PollAndTransmit(destination)
 
-	for time := range time.Tick(Day) {
-		n.logger.Info("started polling at %v", slog.Time("timestamp", time))
+	for {
+		n.sleepUntilNextDay()
 		n.PollAndTransmit(destination)
 	}
+}
+
+func (n NBRBPoller) sleepUntilNextDay() {
+	now := time.Now()
+	nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 1, 0, 0, now.Location())
+	untilNextDay := time.Until(nextDay)
+	time.Sleep(untilNextDay)
 }
 
 func (n NBRBPoller) PollAndTransmit(destination chan<- []schema.Rate) {
