@@ -3,6 +3,8 @@ package models
 import (
 	"fmt"
 	"time"
+
+	"github.com/strCarne/currency/pkg/wrapper"
 )
 
 type Date struct {
@@ -19,6 +21,19 @@ func DateNow() Date {
 		Month: int(month),
 		Day:   day,
 	}
+}
+
+func DateParse(s string) (*Date, error) {
+	parsedTime, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return nil, wrapper.Wrap("models.DateParse", "failed to parse date", err)
+	}
+
+	return &Date{
+		Year:  parsedTime.Year(),
+		Month: int(parsedTime.Month()),
+		Day:   parsedTime.Day(),
+	}, nil
 }
 
 func (d Date) String() string {
