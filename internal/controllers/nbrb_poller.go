@@ -1,4 +1,4 @@
-package contollers
+package controllers
 
 import (
 	"context"
@@ -74,16 +74,16 @@ func (n NBRBPoller) PollAndTransmit(destination chan<- []schema.Rate) {
 
 func (n NBRBPoller) Poll() ([]schema.Rate, error) {
 	for attempt := range n.attemptsNum {
-		n.logger.Info("attempt", slog.Int("number", attempt+1))
+		n.logger.Info("poll attempt", slog.Int("number", attempt+1))
 
 		rates, err := n.InstantPoll()
 		if err == nil {
-			n.logger.Info("operation completed successfully", slog.Any("data", rates))
+			n.logger.Info("polling completed successfully", slog.Any("data", rates))
 
 			return rates, nil
 		}
 
-		n.logger.Info("operation failed", slog.String("cause", err.Error()), slog.Int("attempt", attempt+1))
+		n.logger.Info("polling failed", slog.String("cause", err.Error()), slog.Int("attempt", attempt+1))
 
 		time.Sleep(n.retryDelay)
 	}
