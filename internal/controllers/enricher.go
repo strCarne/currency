@@ -21,6 +21,7 @@ type Enricher struct {
 	logger      *slog.Logger
 	attemptsNum int
 	retryDelay  time.Duration
+	ratesFlow   chan []schema.Rate
 }
 
 func NewEnricher(
@@ -50,13 +51,14 @@ func NewEnricher(
 		logger:      logger,
 		attemptsNum: attemptsNum,
 		retryDelay:  retryDelay,
+		ratesFlow:   make(chan []schema.Rate),
 	}, nil
 }
 
-func (e Enricher) Start(source <-chan []schema.Rate) {
+func (e Enricher) Start() {
 	e.EnrichFromBackup()
 
-	for rates := range source {
+	for rates := range e.ratesFlow {
 		e.EnrichFromBackup()
 
 		err := e.Enrich(rates)
@@ -103,3 +105,5 @@ func (e Enricher) Backup(_ []schema.Rate) {
 }
 
 func (e Enricher) EnrichFromBackup() {}
+
+func (e Enricher) RatesRx() chan<- []schema.Rate { return e.ratesFlow }
