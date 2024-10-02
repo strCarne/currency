@@ -9,9 +9,10 @@ import (
 
 	"github.com/strCarne/currency/internal/clients/nbrb"
 	"github.com/strCarne/currency/internal/controllers"
+	"github.com/strCarne/currency/internal/schema"
 )
 
-func MustPoller(logger *slog.Logger) *controllers.NBRBPoller {
+func MustPoller(logger *slog.Logger, enricherRx chan<- []schema.Rate) *controllers.NBRBPoller {
 	attemptsNumStr := os.Getenv("POLL_ATTEMPTS_NUM")
 	if attemptsNumStr == "" {
 		panic("POLL_ATTEMPTS_NUM must be set")
@@ -32,7 +33,7 @@ func MustPoller(logger *slog.Logger) *controllers.NBRBPoller {
 		panic("POLL_RETRY_DELAY must be duration")
 	}
 
-	poller, err := controllers.NewNBRBPoller(nbrb.NewStd(), logger, attemptsNum, retryDelay)
+	poller, err := controllers.NewNBRBPoller(nbrb.NewStd(), logger, attemptsNum, retryDelay, enricherRx)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create new NBRB poller: %v", err))
 	}
