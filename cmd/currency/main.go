@@ -1,9 +1,7 @@
 package main
 
 import (
-	"github.com/strCarne/currency/internal/schema"
 	"github.com/strCarne/currency/internal/setup"
-	"github.com/strCarne/currency/pkg/db"
 )
 
 func main() {
@@ -11,27 +9,23 @@ func main() {
 	setup.MustEnv()
 
 	// Setting up GORM
-	setup.MustGORM()
+	connPool := setup.MustGORM()
 
 	// Migrations
-	setup.MustMigrate(db.Connection())
+	setup.MustMigrate(connPool)
 
 	// Setting up logger
 	logger := setup.MustLogger()
 
-	// Setting up channel between Poller and Enricher
-	ratesFlow := make(chan []schema.Rate)
-	defer close(ratesFlow)
+	// Starting process of enriching rates table
+	enricher := setup.MustEnricher(logger, connPool)
+	go enricher.Start()
 
 	// Starting process of polling NBRB's API
-	poller := setup.MustPoller(logger)
-	go poller.Start(ratesFlow)
-
-	// Starting process of enriching rates table
-	enricher := setup.MustEnricher(logger)
-	go enricher.Start(ratesFlow)
+	poller := setup.MustPoller(logger, enricher.RatesRx())
+	go poller.Start()
 
 	// Setting up echo server
-	echoServer := setup.Echo(logger)
+	echoServer := setup.Echo(logger, connPool, poller)
 	echoServer.Logger.Fatal(echoServer.Start(":8000"))
 }
