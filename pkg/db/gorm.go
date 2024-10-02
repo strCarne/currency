@@ -9,60 +9,31 @@ import (
 	"gorm.io/gorm"
 )
 
-// SAFETY:
-// gorm.DB is thread-safe, so it is ok to use it in multiple goroutines
-// and be a global variable.
-//
-//nolint:gochecknoglobals
-var connection *gorm.DB
-
 var (
-	ErrInitGORM               = errors.New("filed to initialize GORM")
-	ErrGORMAlreadyInitialized = errors.New("GORM already initialized")
+	ErrInitGORM = errors.New("filed to initialize GORM")
 )
 
-func InitDefaultGORM() error {
-	if connection != nil {
-		return ErrGORMAlreadyInitialized
-	}
-
+func InitDefaultGORM() (*gorm.DB, error) {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		return ErrInitGORM
+		return nil, ErrInitGORM
 	}
 
 	//nolint:exhaustruct
-	conn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	connPool, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return wrapper.Wrap("db.gorm.InitDefaultGORM", "failed to open", err)
+		return nil, wrapper.Wrap("db.gorm.InitDefaultGORM", "failed to open", err)
 	}
 
-	connection = conn
-
-	return nil
+	return connPool, nil
 }
 
-func InitGORM(dsn string, config *gorm.Config) error {
-	if connection != nil {
-		return ErrGORMAlreadyInitialized
-	}
-
-	conn, err := gorm.Open(mysql.Open(dsn), config)
+func InitGORM(dsn string, config *gorm.Config) (*gorm.DB, error) {
+	connPool, err := gorm.Open(mysql.Open(dsn), config)
 	if err != nil {
-		return wrapper.Wrap("db.gorm.InitDefaultGORM", "failed to open", err)
+		return nil, wrapper.Wrap("db.gorm.InitDefaultGORM", "failed to open", err)
 	}
 
-	connection = conn
-
-	return nil
-}
-
-func Connection() *gorm.DB {
-	if connection == nil {
-		if err := InitDefaultGORM(); err != nil {
-			panic(err)
-		}
-	}
-
-	return connection
+	
+	return connPool, nil
 }
