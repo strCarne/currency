@@ -85,8 +85,8 @@ paths:
   /rates/all-collected:
     get:
       description: |-
-        Get all rates, that have been ever polled from NBRB's API and stored into the database. Can return 500 in
-        case if DB is not reachable.
+        Get all rates, that have been ever polled from NBRB's API and stored into the database. Can return 500
+        in case if DB is not reachable.
       produces:
       - application/json
       responses:

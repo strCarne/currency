@@ -34,7 +34,7 @@
         },
         "/rates/all-collected": {
             "get": {
-                "description": "Get all rates, that have been ever polled from NBRB's API and stored into the database. Can return 500 in\ncase if DB is not reachable.",
+                "description": "Get all rates, that have been ever polled from NBRB's API and stored into the database. Can return 500\nin case if DB is not reachable.",
                 "produces": [
                     "application/json"
                 ],
