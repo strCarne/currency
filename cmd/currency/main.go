@@ -34,5 +34,8 @@ func main() {
 
 	// Setting up echo server
 	e := setup.Echo(logger, connPool, poller)
-	e.Logger.Fatal(e.Start("0.0.0.0:8000"))
+
+	// Starting server
+	addr := setup.MustAddress()
+	e.Logger.Fatal(e.Start(addr))
 }
