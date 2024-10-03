@@ -8,7 +8,6 @@ linters:
 linters-settings:
   depguard:
     rules:
-      # Name of a rule.
       main:
         list-mode: lax
         allow:
