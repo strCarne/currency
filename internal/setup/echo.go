@@ -28,7 +28,7 @@ func Echo(logger *slog.Logger, connPool *gorm.DB, poller *controllers.NBRBPoller
 	//
 	//nolint:exhaustruct
 	echoServer.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://0.0.0.0:8000"},
+		AllowOrigins: []string{"http://localhost:8000"},
 		AllowMethods: []string{echo.GET},
 	}))
 
